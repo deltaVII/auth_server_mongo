@@ -2,7 +2,6 @@ from pydantic import BaseModel
 from pydantic import EmailStr
 
 
-
 class CreateUser(BaseModel):
     password: str
     username: str
@@ -14,3 +13,4 @@ class LoginUser(BaseModel):
 
 class AccessToken(BaseModel):
     access_token: str
+

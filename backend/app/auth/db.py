@@ -13,7 +13,7 @@ def create_user(
     new_user = User(
         username=username,
         email=email,
-        hashed_password=hashed_password,
+        hashed_password=hashed_password
     )
     try:
         new_user.save()
@@ -21,6 +21,12 @@ def create_user(
         raise HTTPException(
             status_code=409, detail='Email or username already registered')
     
+def get_user(
+        user_id: str):
+    
+    user = User.objects(id=user_id).first()
+    return user
+
 def get_user_as_email(
         email: str):
     

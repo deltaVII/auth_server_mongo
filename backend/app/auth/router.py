@@ -113,6 +113,3 @@ async def logout(
 
     return {'status': '200'}
 
-
-
-

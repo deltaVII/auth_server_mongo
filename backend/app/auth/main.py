@@ -5,14 +5,14 @@ from fastapi import Cookie, Response
 
 from .jwt import verify_access_token
 from .models import User
-from .db import get_user_as_email
+from .db import get_user as get_user_db
 
 
 '''
 Функции для использования в зависимостях
 '''
 
-async def verify_token(
+def verify_token(
         Authorization: str|None = Header()) -> dict:
 
     decoded_data = verify_access_token(Authorization.split()[1])
@@ -21,11 +21,10 @@ async def verify_token(
             status_code=400, detail='Invalid token')
     return decoded_data
 
-async def get_user(
-        token_data: dict = Depends(verify_token)) -> dict:
+def get_user(
+        user_id: str) -> User:
 
-    user = get_user_as_email(token_data['email'])
-    return dict(user)
+    return get_user_db(user_id)
 
 def get_session(
         session: str | None = Cookie(default=None)) -> str: 
