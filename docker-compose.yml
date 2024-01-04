@@ -1,0 +1,29 @@
+version: "3.8"
+services:
+  backend:
+    container_name: fastAPI_bk2
+    restart: always
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    networks:
+      - custom
+
+  database:
+    container_name: mongo_db2
+    image: mongo:6.0.11
+    restart: always
+
+    ports: 
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=example
+    networks:
+      - custom
+
+networks:
+  custom:
+    driver: bridge
