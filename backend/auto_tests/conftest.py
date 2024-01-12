@@ -1,11 +1,8 @@
-import asyncio
+'''import asyncio
 from typing import AsyncGenerator
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import NullPool
 
 from app.database import get_session
 from app.database import metadata
@@ -42,4 +39,4 @@ async def create_table():
 
 async def drop_table():
     async with engine_test.begin() as conn:
-        await conn.run_sync(metadata.drop_all)
+        await conn.run_sync(metadata.drop_all)'''

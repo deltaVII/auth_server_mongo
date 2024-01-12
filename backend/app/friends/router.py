@@ -1,15 +1,15 @@
 import jwt
 
 from fastapi import APIRouter, Depends
-from fastapi import Cookie, Response
 from fastapi import HTTPException
-from passlib.context import CryptContext
-from mongoengine import NotUniqueError
 from bson.objectid import ObjectId
+from pymongo.database import Database
 
-from ..auth.main import verify_token, get_user
-from ..auth.models import User
-from .db import add_friend_request, delete_friend_request
+
+from ..auth.dependencies import verify_token
+from ..auth.utils import UserRepository
+from ..database import get_database
+from .repository import FriendRepository
 
 router = APIRouter(
     prefix='/friend',
@@ -19,18 +19,22 @@ router = APIRouter(
 @router.post('/friend')
 async def friend(
         user_id: str,
-        current_user: dict = Depends(verify_token)):
+        current_user: dict = Depends(verify_token),
+        database: Database= Depends(get_database)):
     
-    friend_to = get_user(user_id)
-    friend_from = get_user(current_user['user_id'])
+    friend_repository = FriendRepository(database)
+    user_repository = UserRepository(database)
+    
+    friend_to = user_repository.get_by_id(user_id)
+    friend_from = user_repository.get_by_id(current_user['user_id'])
 
     if friend_to is None:
         raise HTTPException(status_code=400, detail='incorrect user_id')
     
-    if ObjectId(current_user['user_id']) in [i.id for i in friend_to.friends]:
+    if ObjectId(user_id) in [i for i in friend_from.get('friends')]:
         raise HTTPException(status_code=400, detail='already friends')
 
-    add_friend_request(current_user['user_id'], user_id)
+    friend_repository.add(user_id, current_user['user_id'])
 
     return {'status': '200'}
 
@@ -38,18 +42,22 @@ async def friend(
 @router.delete('/friend')
 async def friend(
         user_id: str,
-        current_user: dict = Depends(verify_token)):
+        current_user: dict = Depends(verify_token),
+        database: Database= Depends(get_database)):
     
-    friend_to = get_user(user_id)
-    friend_from = get_user(current_user['user_id'])
+    friend_repository = FriendRepository(database)
+    user_repository = UserRepository(database)
+    
+    friend_to = user_repository.get_by_id(user_id)
+    friend_from = user_repository.get_by_id(current_user['user_id'])
 
     if friend_to is None:
         raise HTTPException(status_code=400, detail='incorrect user_id')
     
-    if ObjectId(current_user['user_id']) not in [i.id for i in friend_to.friends]:
+    if ObjectId(user_id) not in [i for i in friend_from.get('friends')]:
         raise HTTPException(status_code=400, detail='already not friends')
 
-    delete_friend_request(current_user['user_id'], user_id)
+    friend_repository.delete(user_id, current_user['user_id'])
 
     return {'status': '200'}
 

@@ -32,13 +32,13 @@ def create_jwt_token(data: dict):
 
 def create_tokens(user: User) -> list[dict]:
     new_refresh_token = create_jwt_token({
-        'user_id': user['id'].__str__(),
+        'user_id': user['id'],
         'username': user['username'],                   
         'email': user['email'],
         'type': 'refresh_token',
     })
     new_access_token = create_jwt_token({
-        'user_id': user['id'].__str__(),
+        'user_id': user['id'],
         'username': user['username'],                   
         'email': user['email'],
         'type': 'access_token',
