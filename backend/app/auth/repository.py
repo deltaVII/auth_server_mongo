@@ -2,9 +2,10 @@ from datetime import datetime
 
 from bson.objectid import ObjectId
 
-from ..repository import PyMongoRepositoryWithDateTime
+from ..repository import DatedPyMongoRepository, PyMongoRepository
 
-class UserRepository(PyMongoRepositoryWithDateTime):
+
+class UserRepository(DatedPyMongoRepository):
     '''
     username: str
     email: str
@@ -27,7 +28,7 @@ class UserRepository(PyMongoRepositoryWithDateTime):
         return super().add_one(data)
     
 
-class UserSessionRepository(PyMongoRepositoryWithDateTime):
+class UserSessionRepository(PyMongoRepository):
     '''
     этот класс нарушает принцип подстановки барбары лисков
     т.к. здесь работают только 3 метода

@@ -5,9 +5,6 @@ from pymongo.database import Database
 from pydantic import BaseModel
 from bson.objectid import ObjectId
 
-'''
-ебни сериализацию на выход
-'''
 
 class PyMongoRepository:
     collection: Collection = None
@@ -78,8 +75,8 @@ class PyMongoRepository:
     def delete_one(self, filters: dict) -> int:
         return self.collection.delete_one(filters).deleted_count
 
-        
-class PyMongoRepositoryWithDateTime(PyMongoRepository):
+
+class DatedPyMongoRepository(PyMongoRepository):
     def add_one(self, data: dict) -> str:
         data['created_at'] = datetime.utcnow()
         data['updated_at'] = datetime.utcnow()

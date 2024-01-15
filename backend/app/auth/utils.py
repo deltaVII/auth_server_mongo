@@ -20,7 +20,6 @@ def is_user_already_registered(
         raise HTTPException(
             status_code=409, detail='username already registered')
     
-    
 def verify_user_session(
         token: str, 
         user_session_repository: UserSessionRepository):

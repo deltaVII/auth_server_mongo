@@ -7,7 +7,6 @@ from .repository import UserRepository
 Функции для использования в зависимостях
 '''
 
-
 def get_user(
         user_id: str,
         database: Database):

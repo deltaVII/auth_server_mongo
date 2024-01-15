@@ -1,15 +1,13 @@
-import jwt
-
 from fastapi import APIRouter, Depends
 from fastapi import HTTPException
 from bson.objectid import ObjectId
 from pymongo.database import Database
 
-
 from ..auth.dependencies import verify_token
 from ..auth.utils import UserRepository
 from ..database import get_database
 from .repository import FriendRepository
+
 
 router = APIRouter(
     prefix='/friend',

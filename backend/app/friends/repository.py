@@ -1,5 +1,6 @@
-from ..repository import PyMongoRepository
 from bson.objectid import ObjectId
+
+from ..repository import PyMongoRepository
 
 
 class FriendRepository(PyMongoRepository):

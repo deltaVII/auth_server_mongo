@@ -1,24 +1,16 @@
-import jwt
-
 from fastapi import APIRouter, Depends
-from fastapi import Cookie, Response
+from fastapi import Response
 from fastapi import HTTPException
 from passlib.context import CryptContext
-from bson.objectid import ObjectId
 from pymongo.database import Database
 
-from .jwt import create_tokens, verify_refresh_token
+from .jwt import create_tokens
 from .schemas import CreateUser, LoginUser
 from .dependencies import get_session
 from .repository import UserRepository, UserSessionRepository
 from .utils import is_user_already_registered, verify_user_session
 from ..database import get_database
 
-'''
-Необходимые эндпоинты для авторизации
-
-Если это возможно то обработка исключений происходит в db.py
-'''
 
 router = APIRouter(
     prefix='/auth',
@@ -27,16 +19,23 @@ router = APIRouter(
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
-
 @router.post('/register',
-    responses={
-        200: {'status': '200'},
-        409: {
-            'example 1': {'detail': 'email already registered'},
-            'example 2': {'detail': 'username already registered'}}})
+    responses={})
+
 async def register_user(
         new_user: CreateUser,
         database: Database= Depends(get_database)):
+    '''register user
+
+    create user from database
+
+    Args:
+        new_user (CreateUser): user data for create
+        database (Database). Defaults to Depends(get_database).
+
+    Returns:
+        _type_: _description_
+    '''
     
     user_repository = UserRepository(database)
 
@@ -56,19 +55,26 @@ async def register_user(
 
 
 @router.post('/login',
-    responses={
-        200: {
-            'session': {
-                'token': 'refresh_token',
-                'type': 'cookie'}, 
-            'access_token': {
-                'token': 'access_token',
-                'type': 'bearer'}},
-        400: {'detail': 'Incorrect username or password'}})
+    responses={})
 async def login_user(
         response: Response,
         login_user: LoginUser,
         database: Database= Depends(get_database)):
+    '''login user
+
+    create user session from: database, cookie
+
+    Args:
+        response (Response): for cookie
+        login_user (LoginUser): user data for login
+        database (Database). Equal to Depends(get_database).
+
+    Raises:
+        HTTPException: _description_
+
+    Returns:
+        _type_: _description_
+    '''    
 
     user_repository = UserRepository(database)
     user_session_repository = UserSessionRepository(database)
@@ -93,23 +99,28 @@ async def login_user(
             'type': 'cookie'}, 
         'access_token': {
             'token': access_token,
-            'type': 'bearer'}}
+            'type': 'bearer'}
+    }
 
 
 @router.put('/token',
-    responses={
-        200: {
-            'session': {
-                'token': 'refresh_token',
-                'type': 'cookie'}, 
-            'access_token': {
-                'token': 'access_token',
-                'type': 'bearer'}},
-        400: {'detail': 'Incorrect token'}})
+    responses={})
 async def update_session(
         response: Response,
         session: str | None = Depends(get_session),
         database: Database= Depends(get_database)):
+    '''update user session
+
+    update user session from: database, cookie
+
+    Args:
+        response (Response) for cookies.
+        session (str | None): user session. Equal to Depends(get_session).
+        database (Database). Equal to Depends(get_database).
+
+    Raises:
+        HTTPException: _description_
+    '''    
 
     user_session_repository = UserSessionRepository(database)
     
@@ -133,24 +144,69 @@ async def update_session(
             'type': 'cookie'}, 
         'access_token': {
             'token': access_token,
-            'type': 'bearer'}}
+            'type': 'bearer'}
+    }
 
 
 @router.delete('/token',
-    responses={
-        200: {'status': '200'},
-        400: {'detail': 'Incorrect token'}})
+    responses={})
 async def logout(
         response: Response,
         session: str | None = Depends(get_session),
         database: Database= Depends(get_database)):
+    '''logout user
+
+    delete user session from: database, cookie
+
+    Args:
+        response (Response): for cookies.
+        session (str | None): user session. Equal to Depends(get_session).
+        database (Database). Equal to Depends(get_database).
+    '''
 
     user_session_repository = UserSessionRepository(database)
 
+    # она еще вызывает аштитипи ексепты
     token_data = verify_user_session(session, user_session_repository)
     
     user_session_repository.delete_one(session)
     response.delete_cookie(key='session')
 
     return {'status': '200'}
+
+
+responses = {
+    'register_user': {
+        200: {'status': '200'},
+        409: {
+            'example 1': {'detail': 'email already registered'},
+            'example 2': {'detail': 'username already registered'}}
+    },
+    'login_user': {
+        200: {
+            'session': {
+                'token': 'refresh_token',
+                'type': 'cookie'}, 
+            'access_token': {
+                'token': 'access_token',
+                'type': 'bearer'}},
+        400: {'detail': 'Incorrect username or password'}
+    },
+    'update_token': {
+        200: {
+            'session': {
+                'token': 'refresh_token',
+                'type': 'cookie'}, 
+            'access_token': {
+                'token': 'access_token',
+                'type': 'bearer'}},
+        400: {'detail': 'Incorrect token'}
+    },
+    'delete_token': {
+        200: {'status': '200'},
+        400: {'detail': 'Incorrect token'}
+    }
+    
+}
+
 

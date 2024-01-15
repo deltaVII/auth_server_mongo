@@ -3,14 +3,13 @@ from datetime import datetime
 from datetime import timedelta
 
 from config import SECRET_KEY
-from .models import User
+
 
 ALGORITHM = 'HS256'
 EXPIRATION_TIME = {
     'access_token': timedelta(minutes=30), 
     'refresh_token': timedelta(days=30),
 }
-
 
 def verify_access_token(token: str):
     try:
@@ -30,7 +29,7 @@ def create_jwt_token(data: dict):
     token = jwt.encode(data, SECRET_KEY, algorithm=ALGORITHM)
     return token
 
-def create_tokens(user: User) -> list[dict]:
+def create_tokens(user: dict) -> list[dict]:
     new_refresh_token = create_jwt_token({
         'user_id': user['id'],
         'username': user['username'],                   

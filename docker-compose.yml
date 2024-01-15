@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   backend:
-    container_name: fastAPI_bk2
+    container_name: fastAPI_bk3
     restart: always
     build:
       context: ./backend
@@ -12,7 +12,7 @@ services:
       - custom
 
   database:
-    container_name: mongo_db2
+    container_name: mongo_db3
     image: mongo:6.0.11
     restart: always
 
